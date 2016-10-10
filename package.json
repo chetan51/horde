@@ -1,0 +1,14 @@
+{
+  "name": "horde",
+  "version": "0.0.1",
+  "description": "Load testing framework for Node.js.",
+  "author": "HIGHKEY Games",
+  "license": "MIT",
+  "main": "./horde.js",
+  "dependencies": {
+    "chance": "^1.0.4",
+    "config": "^1.21.0",
+    "lodash": "^4.16.4",
+    "measured": "^1.1.0"
+  }
+}
