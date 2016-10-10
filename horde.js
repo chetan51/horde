@@ -1,8 +1,12 @@
 "use strict";
 
+// Imports
+const SimulatedUser = require("./simulated_user");
+
 // Exports
 module.exports = {
-  run: run
+  run: run,
+  SimulatedUser: SimulatedUser
 }
 
 // Requirements

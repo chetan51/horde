@@ -10,6 +10,8 @@
     "config": "^1.21.0",
     "lodash": "^4.16.4",
     "measured": "^1.1.0",
+    "request": "^2.75.0",
+    "request-promise": "^4.1.1",
     "rx": "^4.1.0"
   }
 }
