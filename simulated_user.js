@@ -38,7 +38,7 @@ class SimulatedUser {
 
     // DEBUG:
     if (this.debug) {
-      console.log(`${new Date().getTime() / 1000}: ${options.method} ${options.uri}`);
+      console.log(`${new Date().getTime() / 1000}: ${this.constructor.name} ${options.method} ${options.uri}`);
     }
 
     // make request
