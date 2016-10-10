@@ -37,14 +37,14 @@ function run(Config, Users) {
     // select each user at random (weighted) from set of user types
     .map(_i => Chance.weighted(Users, weights.value()))
     // instantiate each user
-    .map(User => new User())
+    .map(User => new User(stats))
     // make stream hot so multiple subscriptions share the same stream (instead of making a copy of the stream)
     .share();
 
   // generate stream of user runs from users
   const userRuns = users
     // run each user
-    .flatMap(user => Rx.Observable.fromNodeCallback(user.run, user)(stats));
+    .flatMap(user => Rx.Observable.fromNodeCallback(user.run, user)());
 
   userRuns.subscribe(
     () => {},
