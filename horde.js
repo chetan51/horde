@@ -44,7 +44,7 @@ function run(Config, Users) {
   // generate stream of user runs from users
   const userRuns = users
     // run each user
-    .flatMap(user => Rx.Observable.fromNodeCallback(user.run, user)());
+    .flatMap(user => Rx.Observable.fromPromise(user.run.bind(user)));
 
   userRuns.subscribe(
     () => {},
