@@ -8,6 +8,9 @@ class SimulatedUser {
   constructor(stats) {
     // store parameters
     this.stats = stats;
+
+    // set default values
+    this.debug = false;
   }
 
   // Make request to server
@@ -31,6 +34,11 @@ class SimulatedUser {
     // set body if it's defined
     if (typeof(body) != "undefined") {
       options.body = body;
+    }
+
+    // DEBUG:
+    if (this.debug) {
+      console.log(`${new Date().getTime() / 1000}: ${options.method} ${options.uri}`);
     }
 
     // make request
