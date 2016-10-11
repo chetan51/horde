@@ -32,7 +32,7 @@ class SimulatedUser {
     };
 
     // set body if it's defined
-    if (typeof(body) != "undefined") {
+    if (typeof(body) != "undefined" && body != null) {
       options.body = body;
     }
 
