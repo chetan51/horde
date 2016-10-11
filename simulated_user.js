@@ -22,7 +22,7 @@ class SimulatedUser {
     }
 
     // time how long it tasks to make request
-    const timer = this.stats.timer(name);
+    const timer = this.stats.timer(`${method} ${name}`);
 
     // define request options
     const options = {
@@ -53,6 +53,11 @@ class SimulatedUser {
       .catch(error => {
         // track error response status code as counter
         this.stats.count(error.statusCode);
+
+        // DEBUG:
+        if (this.debug) {
+          console.log(`[ERROR] ${new Date().getTime() / 1000}: ${this.constructor.name} ${options.method} ${options.uri} ${error.statusCode} ${error.message}`);
+        }
 
         // propagate error
         return error;
