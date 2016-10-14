@@ -2,12 +2,13 @@
 "use strict";
 
 // Requirements
+const _ = require("lodash");
 const Request = require("request-promise");
 
 class SimulatedUser {
-  constructor(stats) {
+  constructor(test) {
     // store parameters
-    this.stats = stats;
+    this.test = test;
 
     // set default values
     this.debug = false;
@@ -22,7 +23,7 @@ class SimulatedUser {
     }
 
     // time how long it tasks to make request
-    const timer = this.stats.timer(`${method} ${name}`);
+    const timer = this.test.stats.timer(`${method} ${name}`);
 
     // define request options
     const options = {
@@ -45,14 +46,14 @@ class SimulatedUser {
     return Request(options)
       .then(body => {
         // track success response status code as counter
-        this.stats.count(200);
+        this.test.stats.count(200);
 
         // propagate body
         return body;
       })
       .catch(error => {
         // track error response status code as counter
-        this.stats.count(error.statusCode);
+        this.test.stats.count(error.statusCode);
 
         // DEBUG:
         if (this.debug) {
@@ -66,6 +67,21 @@ class SimulatedUser {
         // stop timer
         timer.stop();
       });
+  }
+
+  // Helper: Generate random delay duration from given interval
+  delayDuration(intervalName) {
+    // generate random delay duration from interval
+    let delayDuration = _.random(this.test.Config.get(intervalName)[0], this.test.Config.get(intervalName)[1], true);
+
+    // DEBUG: log duration
+    // console.log(`Generated delay for interval ${intervalName}: ${delayDuration}`);
+
+    // convert to seconds
+    delayDuration *= 1000;
+
+    // return delay duration
+    return delayDuration;
   }
 }
 

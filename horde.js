@@ -64,7 +64,7 @@ class Test {
     const User = Chance.weighted(this.Users, this.weights.value());
 
     // instantiate user
-    const user = new User(this.stats);
+    const user = new User(this);
 
     // increment num running users
     this.numRunningUsers++;
