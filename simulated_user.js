@@ -46,14 +46,14 @@ class SimulatedUser {
     return Request(options)
       .then(body => {
         // track success response status code as counter
-        this.test.stats.count(200);
+        this.test.stats.count(`200 ${method} ${name}`);
 
         // propagate body
         return body;
       })
       .catch(error => {
         // track error response status code as counter
-        this.test.stats.count(error.statusCode);
+        this.test.stats.count(`${error.statusCode} ${method} ${name}`);
 
         // DEBUG:
         if (this.debug) {
