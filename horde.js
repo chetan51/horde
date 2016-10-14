@@ -17,7 +17,7 @@ class Test {
     // save parameters
     this.Config = Config;
     this.Users = Users;
-    this.reportInterval = typeof(reportInterval) != "undefined" ? reportInterval : 60000;  // 60 second default value
+    this.reportInterval = typeof(reportInterval) != "undefined" ? reportInterval : 30000;  // 30 second default value
 
     // create a stats collection
     this.stats = new Stats();
