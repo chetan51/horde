@@ -38,6 +38,9 @@ class Test {
 
     // start report loop
     this.startReportLoop();
+
+    // capture interrupt
+    this.captureInterrupt();
   }
 
   startUserLoop() {
@@ -54,9 +57,30 @@ class Test {
   startReportLoop() {
     // every N seconds
     setInterval(() => {
-      // print stats to new file
-      Fs.writeFile(`stats_${Date.now()}.json`, JSON.stringify(this.stats.toJSON()));
+      this.writeStats();
     }, this.reportInterval);
+  }
+
+  writeStats() {
+    // write stats to new file
+    Fs.writeFile(`stats_${Date.now()}.json`, JSON.stringify(this.stats.toJSON()));
+  }
+
+  captureInterrupt() {
+    // capture sigint
+    process.on('SIGINT', () => {
+      // write final stats
+      this.writeStats();
+
+      // log to console
+      console.log(this.stats.toJSON());
+      console.log("Exiting...");
+
+      // exit process after waiting for a second for stats to finish writing
+      setTimeout(() => {
+        process.exit();
+      }, 1000);
+    });
   }
 
   spawnUser() {
