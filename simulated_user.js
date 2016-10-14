@@ -39,7 +39,7 @@ class SimulatedUser {
 
     // DEBUG:
     if (this.debug) {
-      console.log(`${new Date().getTime() / 1000}: ${this.constructor.name} ${options.method} ${options.uri}`);
+      console.log(`${this.timestamp()}: ${this.constructor.name} ${options.method} ${options.uri}`);
     }
 
     // make request
@@ -57,7 +57,7 @@ class SimulatedUser {
 
         // DEBUG:
         if (this.debug) {
-          console.log(`[ERROR] ${new Date().getTime() / 1000}: ${this.constructor.name} ${options.method} ${options.uri} ${error.statusCode} ${error.message}`);
+          console.log(`[ERROR] ${this.timestamp()}: ${this.constructor.name} ${options.method} ${options.uri} ${error.statusCode} ${error.message}`);
         }
 
         // propagate error
@@ -67,6 +67,11 @@ class SimulatedUser {
         // stop timer
         timer.stop();
       });
+  }
+
+  // Helper: Return current timestamp
+  timestamp() {
+    return Math.floor(new Date().getTime() / 1000);
   }
 
   // Helper: Generate random delay duration from given interval
