@@ -3,56 +3,88 @@
 // Imports
 const SimulatedUser = require("./simulated_user");
 
-// Exports
-module.exports = {
-  run: run,
-  SimulatedUser: SimulatedUser
-}
-
 // Requirements
 const _ = require("lodash");
 const Chance = require("chance").Chance();
-const Rx = require("rx");
+const Fs = require("fs");
 
 // Imports
 const Stats = require("./stats");
 
-// Functions
+// Main test class
+class Test {
+  constructor(Config, Users, reportInterval) {
+    // save parameters
+    this.Config = Config;
+    this.Users = Users;
+    this.reportInterval = typeof(reportInterval) != "undefined" ? reportInterval : 60000;  // 60 second default value
 
-// Run horde
-function run(Config, Users) {
-  // create a stats collection
-  const stats = new Stats();
+    // create a stats collection
+    this.stats = new Stats();
 
-  // get weights of each user type
-  const weights = _(Users).map(User => {
-    // if weight is defined, use it
-    if (typeof User.weight != "undefined") return User.weight;
-    // otherwise, return 1 as default value
-    return 1;
-  });
+    // get weights of each user type
+    this.weights = _(Users).map(User => {
+      // if weight is defined, use it
+      if (typeof User.weight != "undefined") return User.weight;
+      // otherwise, return 1 as default value
+      return 1;
+    });
 
-  // generate stream of users
-  const users = Rx.Observable
-    // each user runs after an interval
-    .interval(Config.get("userInterval"))
-    // specify number of users to run
-    .take(Config.get("numUsers"))
-    // select each user at random (weighted) from set of user types
-    .map(_i => Chance.weighted(Users, weights.value()))
-    // instantiate each user
-    .map(User => new User(stats))
-    // make stream hot so multiple subscriptions share the same stream (instead of making a copy of the stream)
-    .share();
+    // initialize count of running users
+    this.numRunningUsers = 0;
 
-  // generate stream of user runs from users
-  const userRuns = users
-    // run each user
-    .flatMap(user => Rx.Observable.fromPromise(user.run.bind(user)));
+    // start user loop
+    this.startUserLoop();
 
-  userRuns.subscribe(
-    () => {},
-    error => console.log(`Error while running user: ${error.stack}`),
-    () => console.log(stats.toJSON())
-  );
+    // start report loop
+    this.startReportLoop();
+  }
+
+  startUserLoop() {
+    // loop forever (asynchronously)
+    setInterval(() => {
+      // if haven't reached max concurrency
+      if (this.numRunningUsers < this.Config.get("numConcurrentUsers")) {
+        // spawn user
+        this.spawnUser();
+      }
+    });
+  }
+
+  startReportLoop() {
+    // every N seconds
+    setInterval(() => {
+      // print stats to new file
+      Fs.writeFile(`stats_${Date.now()}.json`, JSON.stringify(this.stats.toJSON()));
+    }, this.reportInterval);
+  }
+
+  spawnUser() {
+    // select a user at random (weighted) from set of user types
+    const User = Chance.weighted(this.Users, this.weights.value());
+
+    // instantiate user
+    const user = new User(this.stats);
+
+    // increment num running users
+    this.numRunningUsers++;
+
+    // DEBUG: log spawned user
+    console.log(`Spawning user: ${user.id}\t# of running users: ${this.numRunningUsers}`);
+
+    // run user
+    user.run().finally(() => {
+      // DEBUG: log spawned user
+      console.log(`Finished user: ${user.id}\t# of running users: ${this.numRunningUsers}`);
+
+      // when user is finished running, decrement num running users
+      this.numRunningUsers--;
+    })
+  }
+}
+
+// Exports
+module.exports = {
+  Test: Test,
+  SimulatedUser: SimulatedUser
 }
